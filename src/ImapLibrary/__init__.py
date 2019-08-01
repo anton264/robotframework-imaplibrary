@@ -117,21 +117,22 @@ class ImapLibrary(object):
         self._imap.uid('store', email_index, '+FLAGS', r'(\DELETED)')
         self._imap.expunge()
 
-    def get_email_body(self, email_index):
+    def get_email_body(self, email_index, encodingstandard='utf-8'):
         """Returns the decoded email body on multipart email message,
         otherwise returns the body text.
 
         Arguments:
         - ``email_index``: An email index to identity the email message.
+        - ``encodingstandard``: The standard with which the fetched email is encoded. (Default utf-8)
 
         Examples:
-        | Get Email Body | INDEX |
+        | Get Email Body | INDEX | encodingstandard=ISO-8859-1
         """
         if self._is_walking_multipart(email_index):
             body = self.get_multipart_payload(decode=True)
         else:
             encoded_body = self._imap.uid('fetch', email_index, '(BODY[TEXT])')[1][0][1]
-            body = decode(encoded_body, 'quopri_codec').decode('utf-8')
+            body = decode(encoded_body, 'quopri_codec').decode(encodingstandard)
         return body
 
     def get_links_from_email(self, email_index):
